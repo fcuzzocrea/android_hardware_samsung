@@ -114,7 +114,7 @@ public class SamsungDozeService extends Service {
         }
 
         public void testAndEnable() {
-            if ((isDozeEnabled() && (mHandwaveGestureEnabled || mPocketGestureEnabled)) ||
+            if ((isDozeEnabled() && !isAlwaysOnEnabled() && (mHandwaveGestureEnabled || mPocketGestureEnabled)) ||
                     mProximityWakeEnabled) {
                  submit(() -> {
                      mSensorManager.registerListener(this, mSensor,
@@ -170,6 +170,16 @@ public class SamsungDozeService extends Service {
     private boolean isDozeEnabled() {
         return Settings.Secure.getInt(mContext.getContentResolver(),
                 Settings.Secure.DOZE_ENABLED, 1) != 0;
+    }
+
+    protected boolean enableAlwaysOn(boolean enable) {
+        return Settings.Secure.putInt(mContext.getContentResolver(),
+                Settings.Secure.DOZE_ALWAYS_ON, enable ? 1 : 0);
+    }
+
+    private boolean isAlwaysOnEnabled() {
+        return Settings.Secure.getInt(mContext.getContentResolver(),
+                Settings.Secure.DOZE_ALWAYS_ON, 1) != 0;
     }
 
     private void onDisplayOn() {

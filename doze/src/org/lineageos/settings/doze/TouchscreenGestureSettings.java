@@ -28,9 +28,11 @@ import org.lineageos.internal.util.ScreenType;
 
 public class TouchscreenGestureSettings extends PreferenceFragment {
 
+    private static final String KEY_AMBIENT_DISPLAY_ALWAYS_ON = "ambient_display_always_on";
     private static final String KEY_HAND_WAVE = "gesture_hand_wave";
     private static final String KEY_PROXIMITY_WAKE = "proximity_wake_enable";
 
+    private SwitchPreference mAlwaysOnDisplayPreference;
     private SwitchPreference mHandwavePreference;
     private SwitchPreference mProximityWakePreference;
 
@@ -40,6 +42,9 @@ public class TouchscreenGestureSettings extends PreferenceFragment {
         final ActionBar actionBar = getActivity().getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        mAlwaysOnDisplayPreference = 
+            (SwitchPreference) findPreference(KEY_AMBIENT_DISPLAY_ALWAYS_ON);
+        mAlwaysOnDisplayPreference.setOnPreferenceChangeListener(this);
         mHandwavePreference =
             (SwitchPreference) findPreference(KEY_HAND_WAVE);
         mHandwavePreference.setOnPreferenceChangeListener(mProximityListener);
@@ -63,7 +68,9 @@ public class TouchscreenGestureSettings extends PreferenceFragment {
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
             if ((boolean) newValue) {
-                if (preference.getKey().equals(KEY_HAND_WAVE)) {
+				if (preference.getKey().equals(KEY_AMBIENT_DISPLAY_ALWAYS_ON)) {
+				    SamsungDozeService.enableAlwaysOn((Boolean) newValue);
+				} else if (preference.getKey().equals(KEY_HAND_WAVE)) {
                     mProximityWakePreference.setChecked(false);
                 } else if (preference.getKey().equals(KEY_PROXIMITY_WAKE)) {
                     mHandwavePreference.setChecked(false);
